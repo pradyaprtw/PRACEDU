@@ -10,10 +10,15 @@ use App\Models\Subscription;
 
 class CheckSubscription
 {
+    
     public function handle(Request $request, Closure $next): Response
     {
         $user = Auth::user();
 
+        if (!$user) {
+            return redirect()->route('login');
+        }
+        
         // Admin selalu dapat akses
         if ($user->role === 'admin') {
             return $next($request);

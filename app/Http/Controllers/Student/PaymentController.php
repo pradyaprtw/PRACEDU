@@ -8,9 +8,11 @@ use App\Models\Package;
 use App\Models\Payment;
 use App\Models\Subscription;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log; // Penting untuk debugging
 use Midtrans\Config;
 use Midtrans\Snap;
 use Midtrans\Notification;
+use Midtrans\Transaction;
 
 class PaymentController extends Controller
 {
@@ -29,90 +31,126 @@ class PaymentController extends Controller
         $package = Package::findOrFail($request->package_id);
         $user = Auth::user();
 
-        // 1. Buat record payment di database dengan status 'pending'
+        // Buat record payment dengan status 'pending'
         $payment = Payment::create([
             'user_id' => $user->id,
             'package_id' => $package->id,
             'amount' => $package->price,
             'status' => 'pending',
         ]);
+        
+        // Simpan ID pembayaran ke session untuk digunakan nanti
+        session(['last_payment_id' => $payment->id]);
 
-        // 2. Siapkan parameter untuk Midtrans
         $params = [
             'transaction_details' => [
-                'order_id' => $payment->id . '-' . time(), // Order ID unik
+                'order_id' => $payment->id . '-' . time(),
                 'gross_amount' => $package->price,
             ],
             'customer_details' => [
                 'first_name' => $user->name,
                 'email' => $user->email,
             ],
-            'enabled_payments' => ['gopay', 'shopeepay', 'bca_va', 'bni_va', 'bri_va', 'credit_card'],
+            'enabled_payments' => ['gopay', 'shopeepay', 'bca_va', 'bni_va', 'bri_va'],
         ];
 
         try {
-            // 3. Dapatkan Snap Token dari Midtrans
             $snapToken = Snap::getSnapToken($params);
             return view('student.payments.checkout', compact('snapToken', 'package'));
-
         } catch (\Exception $e) {
-            // Tangani error jika gagal membuat token
+            Log::error('Midtrans Snap Token Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal memproses pembayaran. Silakan coba lagi.');
         }
     }
 
-    public function callback(Request $request)
+    /**
+     * Halaman ini dipanggil setelah user selesai di popup Midtrans.
+     * Di sinilah kita akan mengecek status secara manual.
+     */
+    public function success(Request $request)
     {
-        $notification = new Notification();
-
-        $transactionStatus = $notification->transaction_status;
-        $paymentType = $notification->payment_type;
-        $orderId = $notification->order_id;
-        $fraudStatus = $notification->fraud_status;
+        $paymentId = session('last_payment_id');
+        if (!$paymentId) {
+             return redirect()->route('siswa.dashboard')->with('error', 'Sesi pembayaran tidak ditemukan.');
+        }
         
-        // Ekstrak ID payment dari order_id
-        $paymentId = explode('-', $orderId)[0];
         $payment = Payment::find($paymentId);
 
-        if (!$payment) {
-            return; // Payment tidak ditemukan
+        if ($payment && $payment->status === 'pending') {
+            try {
+                // Gunakan order_id yang sama dengan yang dikirim ke Midtrans
+                $orderId = $payment->id . '-' . $payment->created_at->timestamp;
+                
+                $statusResponse = Transaction::status($orderId);
+
+                // --- LOGIKA BARU YANG LEBIH KUAT ---
+                // Paksa konversi respons menjadi array untuk konsistensi
+                $status = json_decode(json_encode($statusResponse), true);
+
+                // Sekarang, kita bisa dengan aman mengaksesnya sebagai array
+                if (isset($status['transaction_status']) && ($status['transaction_status'] == 'settlement' || $status['transaction_status'] == 'capture')) {
+                    $this->activateSubscription($payment);
+                }
+                // --- AKHIR LOGIKA BARU ---
+
+            } catch (\Exception $e) {
+                // Catat error ke log untuk investigasi jika masih terjadi masalah
+                Log::error('Midtrans status check failed: ' . $e->getMessage());
+            }
         }
 
-        // Jangan proses jika status sudah success atau failed
-        if ($payment->status === 'success' || $payment->status === 'failed') {
-            return;
-        }
+        session()->forget('last_payment_id');
 
-        if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
-            // Jika pembayaran berhasil
-            $payment->update(['status' => 'success']);
+        return view('student.payments.success');
+    }
 
-            // Buat atau perpanjang langganan
-            $package = $payment->package;
-            $user = $payment->user;
-
-            $currentSubscription = Subscription::where('user_id', $user->id)->where('end_date', '>=', now())->first();
+    /**
+     * Method ini tetap ada untuk menangani webhook jika nanti di-deploy online.
+     */
+    public function callback(Request $request)
+    {
+        try {
+            $notification = new Notification();
             
-            $startDate = $currentSubscription ? $currentSubscription->end_date : now();
-            
-            Subscription::updateOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'package_id' => $package->id,
-                    'start_date' => $startDate,
-                    'end_date' => \Carbon\Carbon::parse($startDate)->addMonths($package->duration_in_months)
-                ]
-            );
+            $orderIdParts = explode('-', $notification->order_id);
+            $paymentId = $orderIdParts[0];
+            $payment = Payment::find($paymentId);
 
-        } else if ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
-            $payment->update(['status' => 'failed']);
-        } else if ($transactionStatus == 'pending') {
-            $payment->update(['status' => 'pending']);
+            if ($payment && $payment->status === 'pending') {
+                 if ($notification->transaction_status == 'settlement' || $notification->transaction_status == 'capture') {
+                    $this->activateSubscription($payment);
+                }
+            }
+        } catch (\Exception $e) {
+             Log::error('Midtrans Webhook Error: ' . $e->getMessage());
         }
     }
 
-    public function success()
+    /**
+     * Helper function untuk mengaktifkan langganan.
+     */
+    private function activateSubscription(Payment $payment)
     {
-        return view('student.payments.success');
+        // Pastikan kita tidak memproses ulang
+        if ($payment->status !== 'pending') {
+            return;
+        }
+
+        $payment->update(['status' => 'success']);
+
+        $package = $payment->package;
+        $user = $payment->user;
+
+        $currentSubscription = Subscription::where('user_id', $user->id)->where('end_date', '>=', now())->first();
+        $startDate = $currentSubscription ? $currentSubscription->end_date : now();
+        
+        Subscription::updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'package_id' => $package->id,
+                'start_date' => $startDate,
+                'end_date' => \Carbon\Carbon::parse($startDate)->addMonths($package->duration_in_months)
+            ]
+        );
     }
 }

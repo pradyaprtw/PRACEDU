@@ -29,7 +29,14 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        // Redirect based on user role
+        $url = '';
+        if ($request->user()->role === 'admin') {
+            $url = '/admin/dashboard';
+        }if ($request->user()->role === 'siswa') {
+            $url = '/siswa/dashboard';
+        }
+        return redirect()->intended($url);
     }
 
     /**
@@ -39,10 +46,11 @@ class AuthenticatedSessionController extends Controller
     {
         Auth::guard('web')->logout();
 
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
-
-        return redirect('/');
+        if ($request->user()->role === 'admin') {
+            $url = '/admin/dashboard';
+        } else {
+            $url = '/siswa/dashboard';
+        }
+        return redirect()->intended($url);
     }
 }

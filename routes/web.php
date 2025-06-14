@@ -23,6 +23,8 @@ use App\Http\Controllers\Student\ContentController;
 use App\Http\Controllers\Student\PackageController as StudentPackageController;
 use App\Http\Controllers\Student\PaymentController;
 use App\Http\Controllers\Student\StudentExamController;
+use App\Http\Controllers\Student\ProfileController as StudentProfileController;
+
 
 // Halaman utama
 Route::get('/', function () {
@@ -77,6 +79,10 @@ Route::middleware(['auth', 'verified', 'role:siswa'])->prefix('siswa')->name('si
     Route::post('/payment/process', [PaymentController::class, 'process'])->name('payment.process');
     Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
 
+    // Profil Siswa
+    Route::get('/profil', [StudentProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profil', [StudentProfileController::class, 'update'])->name('profile.update');
+
     // Konten Belajar (perlu middleware langganan aktif)
     Route::middleware('check-subscription')->group(function () {
         Route::get('/kategori/{category:slug}', [ContentController::class, 'showCategory'])->name('content.category');
@@ -95,5 +101,7 @@ Route::middleware(['auth', 'verified', 'role:siswa'])->prefix('siswa')->name('si
 
 // Callback dari Midtrans (tidak perlu login)
 Route::post('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
-
+Route::get('/test-ngrok', function () {
+    return 'Koneksi Ngrok Berhasil!';
+});
 require __DIR__.'/auth.php';

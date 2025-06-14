@@ -22,7 +22,7 @@
         <h2 class="text-2xl font-semibold text-gray-700 mb-4">Modul Teks</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($subject->modules as $module)
-            <a href="{{ route('siswa.content.module', $module->id) }}" class="block bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-4">
+            <a href="{{ Storage::url($module->file_path) }}" target="_blank" class="block bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-4">
                 <p class="font-semibold text-gray-800">📄 {{ $module->title }}</p>
             </a>
             @empty
