@@ -1,4 +1,5 @@
 <?php
+// File: app/Http/Controllers/Admin/ModuleController.php
 
 namespace App\Http\Controllers\Admin;
 
@@ -6,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Module;
 use App\Models\Subject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage; // Penting untuk mengelola file
 
 class ModuleController extends Controller
 {
@@ -26,12 +28,19 @@ class ModuleController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'subject_id' => 'required|exists:subjects,id',
-            'content' => 'required|string',
+            'document' => 'required|file|mimes:pdf,doc,docx,ppt,pptx|max:10240', // Maks 10MB
         ]);
 
-        Module::create($request->all());
+        // Simpan file ke storage/app/public/modules
+        $filePath = $request->file('document')->store('modules', 'public');
 
-        return redirect()->route('admin.modules.index')->with('success', 'Modul berhasil ditambahkan.');
+        Module::create([
+            'title' => $request->title,
+            'subject_id' => $request->subject_id,
+            'file_path' => $filePath,
+        ]);
+
+        return redirect()->route('admin.modules.index')->with('success', 'Modul berhasil diunggah.');
     }
     
     public function edit(Module $module)
@@ -45,16 +54,33 @@ class ModuleController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'subject_id' => 'required|exists:subjects,id',
-            'content' => 'required|string',
+            'document' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx|max:10240', // Boleh kosong saat update
         ]);
 
-        $module->update($request->all());
+        $filePath = $module->file_path;
+
+        // Jika ada file baru yang diunggah
+        if ($request->hasFile('document')) {
+            // Hapus file lama
+            Storage::disk('public')->delete($module->file_path);
+            // Simpan file baru
+            $filePath = $request->file('document')->store('modules', 'public');
+        }
+
+        $module->update([
+            'title' => $request->title,
+            'subject_id' => $request->subject_id,
+            'file_path' => $filePath,
+        ]);
 
         return redirect()->route('admin.modules.index')->with('success', 'Modul berhasil diperbarui.');
     }
 
     public function destroy(Module $module)
     {
+        // Hapus file dari storage sebelum menghapus record dari database
+        Storage::disk('public')->delete($module->file_path);
+        
         $module->delete();
         return redirect()->route('admin.modules.index')->with('success', 'Modul berhasil dihapus.');
     }

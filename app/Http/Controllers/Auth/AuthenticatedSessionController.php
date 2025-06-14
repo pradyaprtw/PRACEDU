@@ -29,7 +29,14 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        // Redirect based on user role
+        $url = '';
+        if ($request->user()->role === 'admin') {
+            $url = '/admin/dashboard';
+        }else if ($request->user()->role === 'siswa') {
+            $url = '/siswa/dashboard';
+        }
+        return redirect()->intended($url);
     }
 
     /**
@@ -43,6 +50,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        // Setelah logout, redirect ke halaman utama atau halaman login.
+        // Tidak perlu lagi mengecek role karena user sudah tidak terautentikasi.
+        return redirect('/'); // Atau bisa juga redirect ke '/login'
     }
 }

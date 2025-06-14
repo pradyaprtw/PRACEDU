@@ -23,22 +23,19 @@
             </thead>
             <tbody>
                 @forelse ($modules as $module)
-                    <tr>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ $module->title }}</p>
-                        </td>
-                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ $module->subject->name ?? 'N/A' }}</p>
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
-                            <a href="{{ route('admin.modules.edit', $module) }}" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
-                            <form action="{{ route('admin.modules.destroy', $module) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus modul ini?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
-                            </form>
-                        </td>
-                    </tr>
+                <tr>
+                    <!-- ... -->
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
+                        <a href="{{ Storage::url($module->file_path) }}" target="_blank" class="text-green-600 hover:text-green-900 mr-4">Lihat File</a>
+                        <a href="{{ route('admin.modules.edit', $module) }}" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
+                        <!-- ... form hapus ... -->
+                        <form action="{{ route('admin.modules.destroy', $module) }}" method="POST" class="inline-block">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Apakah Anda yakin ingin menghapus modul ini?')">Hapus</button>
+                        </form>
+                    </td>
+                </tr>
                 @empty
                     <tr>
                         <td colspan="3" class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
