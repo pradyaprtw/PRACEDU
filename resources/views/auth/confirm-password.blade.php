@@ -17,7 +17,7 @@
             <div class="hidden md:flex w-1/2 bg-blue-600 p-12 flex-col justify-between">
                 <div>
                     <h1 class="text-white text-3xl font-bold">PRACEDU</h1>
-                    <p class="text-blue-200 mt-2">Practice for Education</p>
+                    <p class="text-blue-200 mt-2">Preparation Center for Education</p>
                 </div>
                 <div>
                     <h2 class="text-white text-3xl font-bold leading-tight">Area Aman.</h2>

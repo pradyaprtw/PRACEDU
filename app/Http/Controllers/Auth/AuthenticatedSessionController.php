@@ -33,7 +33,7 @@ class AuthenticatedSessionController extends Controller
         $url = '';
         if ($request->user()->role === 'admin') {
             $url = '/admin/dashboard';
-        }if ($request->user()->role === 'siswa') {
+        }else if ($request->user()->role === 'siswa') {
             $url = '/siswa/dashboard';
         }
         return redirect()->intended($url);
@@ -46,11 +46,12 @@ class AuthenticatedSessionController extends Controller
     {
         Auth::guard('web')->logout();
 
-        if ($request->user()->role === 'admin') {
-            $url = '/admin/dashboard';
-        } else {
-            $url = '/siswa/dashboard';
-        }
-        return redirect()->intended($url);
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        // Setelah logout, redirect ke halaman utama atau halaman login.
+        // Tidak perlu lagi mengecek role karena user sudah tidak terautentikasi.
+        return redirect('/'); // Atau bisa juga redirect ke '/login'
     }
 }
