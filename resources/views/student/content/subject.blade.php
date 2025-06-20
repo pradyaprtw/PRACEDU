@@ -33,12 +33,11 @@
 
     <!-- Ujian Section -->
     <div>
-        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Simulasi Ujian</h2>
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Latihan Soal</h2>
          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($subject->exams as $exam)
             <a href="{{ route('siswa.exam.show', $exam->id) }}" class="block bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-4">
                 <p class="font-semibold text-gray-800">📝 {{ $exam->title }}</p>
-                 <p class="text-sm text-gray-500">{{ $exam->questions_count }} Soal, {{ $exam->duration }} Menit</p>
             </a>
             @empty
             <p class="text-gray-500">Belum ada ujian untuk mata pelajaran ini.</p>

@@ -27,7 +27,18 @@ class SubCategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
+            // Tambahkan validasi manual unique per kategori
         ]);
+
+        $normalizedName = strtolower($request->name);
+
+        $exists = SubCategory::where('category_id', $request->category_id)
+            ->whereRaw('LOWER(name) = ?', [$normalizedName])
+            ->exists();
+
+        if ($exists) {
+            return back()->withErrors(['name' => 'Sub Kategori dengan nama tersebut sudah ada dalam kategori yang sama.'])->withInput();
+        }
 
         SubCategory::create([
             'name' => $request->name,
@@ -50,6 +61,17 @@ class SubCategoryController extends Controller
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
         ]);
+
+        $normalizedName = strtolower($request->name);
+
+        $exists = SubCategory::where('category_id', $request->category_id)
+            ->whereRaw('LOWER(name) = ?', [$normalizedName])
+            ->where('id', '<>', $subCategory->id)
+            ->exists();
+
+        if ($exists) {
+            return back()->withErrors(['name' => 'Sub Kategori dengan nama tersebut sudah ada dalam kategori yang sama.'])->withInput();
+        }
 
         $subCategory->update([
             'name' => $request->name,
