@@ -46,6 +46,9 @@
                 <a href="{{ route('admin.exams.index') }}" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md">
                     <span class="mr-2">📝</span> Ujian & Soal
                 </a>
+                <a href="{{ route('admin.tryout.index') }}" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md">
+                    <span class="mr-2">💯</span> Tryout
+                </a>
                 <a href="{{ route('admin.packages.index') }}" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md">
                     <span class="mr-2">📦</span> Paket Langganan
                 </a>

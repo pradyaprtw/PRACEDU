@@ -52,9 +52,9 @@
                 <div class="mx-auto max-w-7xl px-6 pb-24 pt-32 sm:pt-48 lg:px-8">
                     <div class="mx-auto max-w-2xl text-center">
                         <h1 class="text-4xl font-bold tracking-tight text-white sm:text-6xl">Raih PTN Impianmu Bersama PRACEDU</h1>
-                        <p class="mt-6 text-lg leading-8 text-blue-100">Platform belajar online terlengkap dengan ribuan video materi, latihan soal, dan simulasi ujian UTBK & Mandiri yang dirancang untuk membantumu sukses.</p>
+                        <p class="mt-6 text-lg leading-8 text-blue-100">Platform belajar online terlengkap dengan ribuan video materi, latihan soal, dan Tryout UTBK yang dirancang untuk membantumu sukses.</p>
                         <div class="mt-10 flex items-center justify-center gap-x-6">
-                            <a href="{{ route('register') }}" class="rounded-md bg-white px-5 py-3 text-sm font-semibold text-blue-600 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-transform transform hover:scale-105">Daftar Sekarang</a>
+                            <a href="{{ route('register') }}" class="rounded-md bg-white px-5 py-3 text-sm font-semibold text-blue-600 shadow-sm hover:bg-gray-100  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-transform transform hover:scale-105">Daftar Sekarang</a>
                             <a href="#fitur" class="text-sm font-semibold leading-6 text-white">Pelajari lebih lanjut <span aria-hidden="true">→</span></a>
                         </div>
                     </div>
