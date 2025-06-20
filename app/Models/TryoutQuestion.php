@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TryoutQuestion extends Model
 {
-    protected $fillable = ['subtest_id', 'question_text', 'question_type', 'correct_answer', 'explanation'];
+    protected $fillable = ['subtest_id', 'question_text', 'question_type', 'correct_answer'];
 
     public function subtest()
     {

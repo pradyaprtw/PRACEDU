@@ -74,6 +74,7 @@ class TryoutController extends Controller
     // Question CRUD
     public function createQuestion(Subtest $subtest)
     {
+        $subtest->load('tryoutQuestions');
         return view('admin.tryout.questions.create', compact('subtest'));
     }
 
@@ -84,7 +85,6 @@ class TryoutController extends Controller
             'correct_answer' => 'required|string|in:A,B,C,D',
             'option_labels' => 'required|array|size:4',
             'option_texts' => 'required|array|size:4',
-            'explanation' => 'nullable|string',
         ]);
 
         // Cek apakah sudah mencapai batas maksimal soal
@@ -97,7 +97,6 @@ class TryoutController extends Controller
         $question = $subtest->tryoutQuestions()->create([
             'question_text' => $request->question_text,
             'correct_answer' => $request->correct_answer,
-            'explanation' => $request->explanation,
         ]);
 
         // 2. Simpan semua opsi jawaban
@@ -110,7 +109,7 @@ class TryoutController extends Controller
         }
 
         return redirect()->route('admin.tryout.show', $subtest->package_id)
-            ->with('success', 'Soal beserta pilihan jawaban berhasil ditambahkan.');
+            ->with('success', 'Soal berhasil ditambahkan.');
     }
 
 

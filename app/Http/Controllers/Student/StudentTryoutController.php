@@ -24,14 +24,22 @@ class StudentTryoutController extends Controller
         $package = TryoutPackage::findOrFail($packageId);
         $subtests = Subtest::where('package_id', $packageId)->get();
 
-        return view('student.tryout.subtests', compact('package', 'subtests'));
+        $user = Auth::user();
+        $attemptedSubtests = TryoutAttempt::where('user_id', $user->id)
+            ->whereIn('subtest_id', $subtests->pluck('id'))
+            ->pluck('subtest_id')
+            ->toArray();
+
+        return view('student.tryout.subtests', compact('package', 'subtests', 'attemptedSubtests'));
     }
 
     public function questions($subtestId)
     {
         $subtest = Subtest::with('tryoutQuestions.answers')->findOrFail($subtestId);
-        return view('student.tryout.questions', compact('subtest'));
+        $durationMinutes = $subtest->duration_minutes;  // ambil dari tabel
+        return view('student.tryout.questions', compact('subtest', 'durationMinutes'));
     }
+
 
     public function submitSubtest(Request $request, $subtestId)
     {
@@ -57,8 +65,22 @@ class StudentTryoutController extends Controller
             ]
         );
 
-        return redirect()->back()->with('success', 'Jawaban subtest berhasil disimpan.');
+        // Cari next subtest
+        $subtest = Subtest::findOrFail($subtestId);
+        $packageId = $subtest->package_id;
+
+        $nextSubtest = Subtest::where('package_id', $packageId)
+            ->where('id', '>', $subtestId)
+            ->orderBy('id')
+            ->first();
+
+        if ($nextSubtest) {
+            return redirect()->route('siswa.tryout.questions', $nextSubtest->id)->with('success', 'Jawaban subtest berhasil disimpan. Lanjut ke subtest berikutnya.');
+        } else {
+            return redirect()->route('siswa.tryout.subtests', $packageId)->with('success', 'Semua subtest selesai!');
+        }
     }
+
 
     public function submitPackage(Request $request, $packageId)
     {
@@ -66,7 +88,7 @@ class StudentTryoutController extends Controller
 
         // Cek apakah sudah pernah submit paket
         if (TryoutPackageAttempt::where('user_id', $user->id)->where('package_id', $packageId)->exists()) {
-            return redirect()->route('siswa.tryout.result', $packageId)->with('error', 'Paket sudah pernah dikumpulkan.');
+            return redirect()->route('siswa.tryout.result', $packageId)->with('error', 'TryOut sudah pernah dikumpulkan.');
         }
 
         $subtests = Subtest::where('package_id', $packageId)->pluck('id');

@@ -100,9 +100,9 @@
                                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                     </div>
-                                    Simulasi Ujian Realistis
+                                    TryOut Realistis
                                 </dt>
-                                <dd class="mt-2 text-base leading-7 text-gray-600">Biasakan diri dengan tekanan ujian melalui simulasi UTBK & Mandiri yang mirip dengan aslinya, lengkap dengan timer dan penilaian.</dd>
+                                <dd class="mt-2 text-base leading-7 text-gray-600">Biasakan diri dengan tekanan ujian melalui simulasi UTBK yang mirip dengan aslinya, lengkap dengan timer dan penilaian.</dd>
                             </div>
                              <div class="relative pl-16">
                                 <dt class="text-base font-semibold leading-7 text-gray-900">
