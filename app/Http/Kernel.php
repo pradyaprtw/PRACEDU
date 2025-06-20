@@ -66,5 +66,8 @@ class Kernel extends HttpKernel
         'role' => \App\Http\Middleware\RoleMiddleware::class,
         'check-subscription' => \App\Http\Middleware\CheckSubscription::class,
         'check-exam-access' => \App\Http\Middleware\CheckExamAccess::class,
+
+        'prevent-retake-tryout' => \App\Http\Middleware\PreventRetakeTryout::class,
+        'check-tryout-attempt' => \App\Http\Middleware\CheckTryoutAttempt::class,
     ];
 }

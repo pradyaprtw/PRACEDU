@@ -52,9 +52,9 @@
                 <div class="mx-auto max-w-7xl px-6 pb-24 pt-32 sm:pt-48 lg:px-8">
                     <div class="mx-auto max-w-2xl text-center">
                         <h1 class="text-4xl font-bold tracking-tight text-white sm:text-6xl">Raih PTN Impianmu Bersama PRACEDU</h1>
-                        <p class="mt-6 text-lg leading-8 text-blue-100">Platform belajar online terlengkap dengan ribuan video materi, latihan soal, dan simulasi ujian UTBK & Mandiri yang dirancang untuk membantumu sukses.</p>
+                        <p class="mt-6 text-lg leading-8 text-blue-100">Platform belajar online terlengkap dengan ribuan video materi, latihan soal, dan Tryout UTBK yang dirancang untuk membantumu sukses.</p>
                         <div class="mt-10 flex items-center justify-center gap-x-6">
-                            <a href="{{ route('register') }}" class="rounded-md bg-white px-5 py-3 text-sm font-semibold text-blue-600 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-transform transform hover:scale-105">Daftar Sekarang</a>
+                            <a href="{{ route('register') }}" class="rounded-md bg-white px-5 py-3 text-sm font-semibold text-blue-600 shadow-sm hover:bg-gray-100  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-transform transform hover:scale-105">Daftar Sekarang</a>
                             <a href="#fitur" class="text-sm font-semibold leading-6 text-white">Pelajari lebih lanjut <span aria-hidden="true">→</span></a>
                         </div>
                     </div>
@@ -100,9 +100,9 @@
                                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                     </div>
-                                    Simulasi Ujian Realistis
+                                    TryOut Realistis
                                 </dt>
-                                <dd class="mt-2 text-base leading-7 text-gray-600">Biasakan diri dengan tekanan ujian melalui simulasi UTBK & Mandiri yang mirip dengan aslinya, lengkap dengan timer dan penilaian.</dd>
+                                <dd class="mt-2 text-base leading-7 text-gray-600">Biasakan diri dengan tekanan ujian melalui simulasi UTBK yang mirip dengan aslinya, lengkap dengan timer dan penilaian.</dd>
                             </div>
                              <div class="relative pl-16">
                                 <dt class="text-base font-semibold leading-7 text-gray-900">

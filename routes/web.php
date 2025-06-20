@@ -18,12 +18,16 @@ use App\Http\Controllers\Admin\VideoController;
 use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\PackageController;
+use App\Http\Controllers\Admin\TryoutController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\ContentController;
 use App\Http\Controllers\Student\PackageController as StudentPackageController;
 use App\Http\Controllers\Student\PaymentController;
 use App\Http\Controllers\Student\StudentExamController;
 use App\Http\Controllers\Student\ProfileController as StudentProfileController;
+use App\Http\Controllers\Student\StudentTryoutController;
+
+
 
 
 // Halaman utama
@@ -56,18 +60,37 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::resource('modules', ModuleController::class);
     Route::resource('videos', VideoController::class);
     Route::resource('packages', PackageController::class);
-    
+
     // Nested resource untuk Soal di dalam Ujian
     // Contoh URL: /admin/exams/1/questions/create
     Route::resource('exams', ExamController::class);
     Route::resource('exams.questions', QuestionController::class)->shallow();
+
+    // Tryout
+    Route::get('tryout', [TryoutController::class, 'index'])->name('tryout.index');
+    Route::get('tryout/create', [TryoutController::class, 'create'])->name('tryout.create');
+    Route::post('tryout', [TryoutController::class, 'store'])->name('tryout.store');
+    Route::get('tryout/{tryoutPackage}', [TryoutController::class, 'show'])->name('tryout.show');
+    Route::delete('tryout/{tryoutPackage}', [TryoutController::class, 'destroy'])->name('tryout.destroy');
+
+    Route::get('tryout/{tryoutPackage}/subtest/create', [TryoutController::class, 'createSubtest'])->name('tryout.subtest.create');
+    Route::post('tryout/{tryoutPackage}/subtest', [TryoutController::class, 'storeSubtest'])->name('tryout.subtest.store');
+    Route::delete('tryout/{tryoutPackage}/subtest/{subtest}', [TryoutController::class, 'destroySubtest'])->name('tryout.subtest.destroy');
+
+    Route::get('subtest/{subtest}/question/create', [TryoutController::class, 'createQuestion'])->name('tryout.question.create');
+    Route::post('subtest/{subtest}/question', [TryoutController::class, 'storeQuestion'])->name('tryout.question.store');
+    Route::delete('subtest/{subtest}/question/{tryoutQuestion}', [TryoutController::class, 'destroyQuestion'])->name('tryout.question.destroy');
+
+    Route::get('question/{tryoutQuestion}/answer/create', [TryoutController::class, 'createAnswer'])->name('tryout.answer.create');
+    Route::post('question/{tryoutQuestion}/answer', [TryoutController::class, 'storeAnswer'])->name('tryout.answer.store');
+    Route::delete('question/{tryoutQuestion}/answer/{tryoutAnswer}', [TryoutController::class, 'destroyAnswer'])->name('tryout.answer.destroy');
 });
 
 /*|--------------------------------------------------------------------------
 | RUTE PANEL SISWA
 | Semua rute di sini memerlukan login dan role 'siswa'.
 |--------------------------------------------------------------------------
-*/  
+*/
 
 Route::middleware(['auth', 'verified', 'role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
     // Dashboard
@@ -96,6 +119,14 @@ Route::middleware(['auth', 'verified', 'role:siswa'])->prefix('siswa')->name('si
         Route::get('/ujian/simulasi/{userExamAttempt}', [StudentExamController::class, 'simulation'])->name('exam.simulation');
         Route::post('/ujian/simulasi/{userExamAttempt}/submit', [StudentExamController::class, 'submit'])->name('exam.submit');
         Route::get('/ujian/hasil/{userExamAttempt}', [StudentExamController::class, 'result'])->name('exam.result');
+        // Tryout UTBK
+        // Tryout
+        Route::get('/tryout', [StudentTryoutController::class, 'packages'])->name('tryout.packages');
+        Route::get('/tryout/{packageId}/subtests', [StudentTryoutController::class, 'subtests'])->name('tryout.subtests');
+        Route::get('/subtest/{subtestId}/questions', [StudentTryoutController::class, 'questions'])->name('tryout.questions');
+        Route::post('/subtest/{subtestId}/submit', [StudentTryoutController::class, 'submitSubtest'])->name('tryout.submitSubtest');
+        Route::post('/tryout/{packageId}/submit-package', [StudentTryoutController::class, 'submitPackage'])->name('tryout.submitPackage');
+        Route::get('/tryout/{packageId}/result', [StudentTryoutController::class, 'result'])->name('tryout.result');
     });
 });
 
@@ -104,4 +135,4 @@ Route::post('/payment/callback', [PaymentController::class, 'callback'])->name('
 Route::get('/test-ngrok', function () {
     return 'Koneksi Ngrok Berhasil!';
 });
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

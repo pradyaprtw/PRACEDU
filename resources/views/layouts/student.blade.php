@@ -18,6 +18,7 @@
                     </div>
                     <div class="flex items-center">
                         <a href="{{ route('siswa.dashboard') }}" class="px-3 py-2 text-gray-700 hover:underline">Dashboard</a>
+                        <a href="{{ route('siswa.tryout.packages') }}" class="px-3 py-2 text-gray-700 hover:underline">Try Out</a>
                         <a href="{{ route('siswa.packages.index') }}" class="px-3 py-2 text-gray-700 hover:underline">Paket Belajar</a>
                         
                         <!-- User Dropdown (BARU) -->
