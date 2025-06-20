@@ -6,9 +6,6 @@
         @csrf
         <div class="bg-white rounded-lg shadow-md p-4 mb-6 sticky top-0 z-10 flex justify-between items-center">
             <h1 class="text-xl font-bold text-gray-800">{{ $userExamAttempt->exam->title }}</h1>
-            <div class="text-lg font-bold text-red-600 bg-red-100 px-4 py-2 rounded-md">
-                Sisa Waktu: <span x-text="displayTime"></span>
-            </div>
         </div>
 
         @foreach($userExamAttempt->exam->questions as $index => $question)
